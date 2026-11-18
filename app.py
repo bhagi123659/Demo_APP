@@ -1,7 +1,7 @@
 import streamlit as st
 from groq import Groq
 st.set_page_config(page_title = 'Placement Practice' , layout = 'centered')
-st.title('Afra Farseen')
+st.title('bhagirati s')
 st.caption('AI Placement Assistant')
 st.caption('Practice and prepare for the interview')
 try:
