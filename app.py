@@ -1,4 +1,4 @@
 import streamlit as st
 st.set_page_config(page_title = 'About Me',page_icon = '😍',layout = 'centered')
-st.title("Bhagirati s")
-st.caption("senior Technical Trainer")
+st.title('Bhagirati s')
+st.caption('senior Technical Trainer')
