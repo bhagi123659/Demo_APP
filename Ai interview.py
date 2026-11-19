@@ -2,7 +2,7 @@ import streamlit as st
 
 # Page configuration
 st.set_page_config(
-    page_title="LLM",
+    page_title="AI Interview",
     layout="centered"
 )
 
@@ -15,7 +15,7 @@ try:
     from groq import Groq
 except ImportError:
     st.error("Groq package is not installed.")
-    st.info("Add groq to your requirements.txt file and redeploy.")
+    st.info("Add groq to your requirements.txt file.")
     st.stop()
 
 # API configuration
@@ -46,7 +46,7 @@ role = st.selectbox(
 )
 
 if role == "Others":
-    role = st.text_input("Enter your Job Title", "XXXXXX")
+    role = st.text_input("Enter your Job Title")
 
 # Model selection
 model = st.selectbox(
@@ -60,11 +60,7 @@ model = st.selectbox(
 # Difficulty level
 level = st.selectbox(
     "Choose your level",
-    [
-        "Beginner",
-        "Intermediate",
-        "Advanced"
-    ]
+    ["Beginner", "Intermediate", "Advanced"]
 )
 
 # Activity selection
@@ -78,15 +74,13 @@ mode = st.radio(
     ]
 )
 
-# Generate Questions
+# Activity inputs
 if mode == "Generate Questions":
 
     count = st.slider(
-        "Number of Questions",
-        1, 10, 5
+        "Number of Questions", 1, 10, 5
     )
 
-# Generate Code Questions
 elif mode == "Generate Code Questions":
 
     topic = st.selectbox(
@@ -95,11 +89,9 @@ elif mode == "Generate Code Questions":
     )
 
     count = st.slider(
-        "Number of Questions",
-        1, 10, 5
+        "Number of Questions", 1, 10, 5
     )
 
-# Evaluate or Improve Answers
 else:
 
     question = st.text_area(
@@ -111,7 +103,7 @@ else:
         height=160
     )
 
-# Generate AI Response Button
+# Generate AI Response
 if st.button("Generate AI Response", type="primary"):
 
     # Input validation
@@ -121,52 +113,54 @@ if st.button("Generate AI Response", type="primary"):
             st.warning("Please enter a valid Question and Answer.")
             st.stop()
 
-    # Topics and difficulty
-    topics = (
-        "Job Role: " + role +
-        "\nDifficulty: " + level
+    if mode == "Others" and not role.strip():
+        st.warning("Please enter your Job Title.")
+        st.stop()
+
+    # Background information
+    background = (
+        f"Job Role: {role}\n"
+        f"Difficulty Level: {level}\n"
     )
 
     # Task generation
     if mode == "Generate Questions":
 
         task = (
-            "Generate " + str(count) +
-            " frequently asked interview questions for the job role "
-            + role +
-            ". Include 3 situation-based questions and 2 theory questions."
+            f"Generate {count} frequently asked interview questions "
+            f"for the job role {role}. "
+            "Include situation-based and theory questions."
         )
 
     elif mode == "Generate Code Questions":
 
         task = (
-            "Generate " + str(count) +
-            " frequently asked coding or technical questions "
-            "for the topic " + topic +
-            ". Also provide hints and explain the expected approach."
+            f"Generate {count} coding or technical questions "
+            f"for {topic}. "
+            "Provide hints and explain the expected approach."
         )
 
     elif mode == "Evaluate Answers":
 
         task = (
-            "Question: " + question +
-            "\nAnswer: " + answer +
-            "\nEvaluate the answer based on the question. "
-            "Identify the drawbacks, strengths, and areas of improvement."
+            f"Question: {question}\n"
+            f"Answer: {answer}\n"
+            "Evaluate the answer. Identify strengths, drawbacks "
+            "and areas of improvement."
         )
 
     elif mode == "Improve Answers":
 
         task = (
-            "Question: " + question +
-            "\nAnswer: " + answer +
-            "\nImprove the answer and highlight the important points."
+            f"Question: {question}\n"
+            f"Answer: {answer}\n"
+            "Improve the answer and highlight important points."
         )
 
-    # Combine instructions
-    prompt = topics + "\n" + task
+    # Combine prompt
+    prompt = background + task
 
-    # Call Groq API
+    # Groq API request
     try:
 
         with st.spinner("Generating AI Response..."):
@@ -175,18 +169,36 @@ if st.button("Generate AI Response", type="primary"):
                 model=model,
                 messages=[
                     {
+                        "role": "system",
+                        "content": (
+                            "Act as an expert Technical Interviewer "
+                            "and HR professional. "
+                            "Provide accurate, clear and helpful answers."
+                        )
+                    },
+                    {
                         "role": "user",
                         "content": prompt
                     }
                 ],
-                temperature=0.7
+                temperature=0.7,
+                max_tokens=1800
             )
 
             ai_response = response.choices[0].message.content
 
         # Display response
         st.subheader("AI Generated Response")
-        st.write(ai_response)
+        st.markdown(ai_response)
+
+        # Download response
+        st.download_button(
+            label="Download Response",
+            data=ai_response,
+            file_name="AI_Interview_Response.txt",
+            mime="text/plain"
+        )
 
     except Exception as e:
+
         st.error(f"Something went wrong: {e}")
