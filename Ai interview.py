@@ -3,7 +3,7 @@ from groq import Groq
 st.set_page_config(page_title = "interview assistent",page_icon='🫶',layout = 'centered')
 st.title("AI Inteview Assistant")
 st.caption("Pactice and Prepare for your Placements here")
-st.caption("Launched by Akshata Ganesh")
+st.caption("Launched by Bhagirati s")
 try:
   client = Groq(api_key = st.secrets["GROQ_API_KEY"])
 except(KeyError,FileNotFound):
