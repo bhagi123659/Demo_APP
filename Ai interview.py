@@ -173,3 +173,4 @@ if st.button("Generate AI Response", type="primary"):
             st.info("Please check your API key and rate limits.")
 
 st.caption("Powered by Streamlit and Groq API")
+
